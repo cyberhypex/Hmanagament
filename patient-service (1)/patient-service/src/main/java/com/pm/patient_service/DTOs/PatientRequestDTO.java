@@ -1,5 +1,6 @@
 package com.pm.patient_service.DTOs;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,8 +17,12 @@ public class PatientRequestDTO {
     private String name;
 
     @NotBlank(message = "E-mail is required")
+
     @Email(message = "E-mail should be valid")
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$\n",message = "Regex not matched")
+    @Pattern(
+            regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+            message = "Email format is invalid"
+    )
     private String email;
 
     @NotBlank(message = "Address is required")

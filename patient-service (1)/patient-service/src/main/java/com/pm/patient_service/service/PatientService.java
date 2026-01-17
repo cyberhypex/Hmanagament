@@ -25,6 +25,7 @@ public class PatientService {
     }
 
     public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO){
+
         Patient newPatient=patientRepository.save(
                 PatientMapper.fromDTO(patientRequestDTO)
         );
