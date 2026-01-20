@@ -9,6 +9,7 @@ import com.pm.patient_service.model.Patient;
 import com.pm.patient_service.repository.PatientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -48,13 +49,19 @@ public class PatientService {
         patient.setName(patientRequestDTO.getName());
         patient.setAddress(patientRequestDTO.getAddress());
         patient.setEmail(patientRequestDTO.getEmail());
-        System.out.println("DOB = [" + patientRequestDTO.getDateOfBirth() + "]");
+      //  System.out.println("DOB = [" + patientRequestDTO.getDateOfBirth() + "]");
 
         patient.setDateOfBirth(LocalDate.parse(patientRequestDTO.getDateOfBirth()));
 
         Patient updatedPatient=patientRepository.save(patient);
         return PatientMapper.toDTO(updatedPatient);
     }
+
+    public void deletePatient(UUID id){
+
+        patientRepository.deleteById(id);
+    }
+
 
 
 

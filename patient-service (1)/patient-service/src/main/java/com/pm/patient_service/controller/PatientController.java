@@ -20,7 +20,6 @@ import java.util.UUID;
 @RequestMapping("/patients")
 public class PatientController {
 
-    @Autowired
     private final PatientService patientService;
 
     public PatientController(PatientService patientService) {
@@ -44,6 +43,12 @@ public class PatientController {
     public ResponseEntity<PatientResponseDTO> updatePatient(@PathVariable UUID id,@Validated(Default.class) @RequestBody PatientRequestDTO patientRequestDTO){
         PatientResponseDTO patientResponseDTO=patientService.updatePatient(id,patientRequestDTO);
         return ResponseEntity.ok().body(patientResponseDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public  ResponseEntity<Void> deletePatient(@PathVariable UUID id){
+        patientService.deletePatient(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
