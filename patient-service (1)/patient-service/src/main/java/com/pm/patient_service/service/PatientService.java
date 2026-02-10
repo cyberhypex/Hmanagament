@@ -4,22 +4,30 @@ import com.pm.patient_service.DTOs.PatientRequestDTO;
 import com.pm.patient_service.DTOs.PatientResponseDTO;
 import com.pm.patient_service.exception.EmailAlreadyExistsException;
 import com.pm.patient_service.exception.PatientNotFoundException;
+import com.pm.patient_service.grpc.BillingServiceGrpcClient;
 import com.pm.patient_service.mapper.PatientMapper;
 import com.pm.patient_service.model.Patient;
 import com.pm.patient_service.repository.PatientRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.DeleteMapping;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class PatientService {
 
-    @Autowired
-    private PatientRepository patientRepository;
+
+    private final PatientRepository patientRepository;
+    private  final BillingServiceGrpcClient billingServiceGrpcClient;
+
+    public PatientService(PatientRepository patientRepository, BillingServiceGrpcClient billingServiceGrpcClient) {
+        this.patientRepository = patientRepository;
+        this.billingServiceGrpcClient = billingServiceGrpcClient;
+    }
 
     public List<PatientResponseDTO> getPatient(){
         List<Patient> patients=patientRepository.findAll();
@@ -29,15 +37,27 @@ public class PatientService {
 
     }
 
-    public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO){
-        if(patientRepository.existsByEmail(patientRequestDTO.getEmail())){
-            throw new EmailAlreadyExistsException("A patient with the same e-mail already exists"+patientRequestDTO.getEmail());
-        }
-        Patient newPatient=patientRepository.save(
+    public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO) {
+
+        log.info("createPatient() called");
+
+        Patient newPatient = patientRepository.save(
                 PatientMapper.fromDTO(patientRequestDTO)
         );
+
+        log.info("Calling billing-service via gRPC");
+
+        billingServiceGrpcClient.createBillingAccount(
+                newPatient.getId().toString(),
+                newPatient.getName(),
+                newPatient.getEmail()
+        );
+
+        log.info("Returned from billing-service gRPC call");
+
         return PatientMapper.toDTO(newPatient);
     }
+
 
     public PatientResponseDTO updatePatient(UUID id, PatientRequestDTO patientRequestDTO){
         Patient patient=patientRepository.findById(id).orElseThrow(
