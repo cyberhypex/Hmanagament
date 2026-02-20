@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS patient
 );
 
 -- Insert well-known UUIDs for specific patients
+-- Apache kafka developed in docker running on same n/w
 INSERT INTO patient (id, name, email, address, date_of_birth, registered_date)
 SELECT '123e4567-e89b-12d3-a456-426614174000',
        'John Doe',
